@@ -1,134 +1,58 @@
-# Pintadasso — Caderno de Esboços de Bolso
-
-**Aplicativo mobile de sketchbook digital** desenvolvido em React Native com Expo e Firebase.
-
----
-
-## Problema e Proposta de Valor
-
-Estudantes de arte, designers e entusiastas do desenho muitas vezes não têm acesso a um caderno físico no momento em que a inspiração bate. O **Pintadasso** resolve isso oferecendo um caderno de esboços digital sempre disponível no bolso — com funcionamento **100% offline** e sincronização automática com a nuvem quando houver internet.
-
-**Público-alvo:** Estudantes de design, ilustradores iniciantes, artistas que querem registrar esboços rápidos no dia a dia.
-
-![Firebase Funcionando](./assets/firebase/firebase.png)
-
----
-
-## Funcionalidades
-
-- **Autenticação** — Login e cadastro com e-mail/senha via Firebase Authentication  
-- **Tela de Desenho** — Canvas SVG com gesto de toque
-  - 18 cores artísticas (Tinta da China, Carvão, Sépia, Cobalto, etc.)
-  - 5 pincéis com presets de espessura e opacidade (Lápis, Caneta, Pincel, Marcador, Borracha)
-  - 4 modos de fundo (Linhas de caderno, Pontilhado, Grade, Limpo)
-- **Galeria** — Lista de esboços com preview miniatura SVG, data e status de sincronização (✓/✗)
-- **Offline First** — Todos os dados são gravados localmente primeiro e sincronizados com o Firestore quando houver conexão
-- **Banner de status** — Avisa ao usuário quando está sem internet ou sincronizando
-
----
-
-## Estrutura de Pastas
-
-```
-src/
-├── navegacao/
-│   └── Navegador.tsx         # Configuração de rotas tipadas
-├── servicos/
-│   └── configuracaoFirebase.ts  # Firebase Auth + Firestore
-└── telas/
-    ├── TelaLogin.tsx         # Login com Firebase Auth
-    ├── TelaCadastro.tsx      # Cadastro com Firebase Auth
-    ├── TelaGaleria.tsx       # Listagem + sync automático
-    └── TeladeDesenho.tsx     # Canvas + lógica Offline-First
-```
-
----
-
-## Estratégia Offline First
-
-```
-Usuário salva desenho
-        │
-        ▼
-[1] Salva no AsyncStorage  ←── sempre, com ou sem internet
-        │
-        ▼
-[2] Checa conexão (NetInfo)
-        │
-   ┌────┴────┐
-   │         │
-  SIM       NÃO
-   │         │
-   ▼         ▼
-[3a] Envia  [3b] marca sincronizado: false
-  Firestore       (fica na fila)
-   │
-   ▼
-[4] marca sincronizado: true
-        │
-        ▼
-[5] Ao abrir a Galeria com internet:
-    sincronizarPendentes() varre o AsyncStorage
-    e envia automaticamente os que estão na fila
-```
-
----
-
-## Tecnologias
-
-| Tecnologia | Uso |
-|---|---|
-| React Native + Expo | Interface mobile |
-| React Navigation | Navegação entre telas |
-| react-native-svg | Canvas de desenho |
-| react-native-gesture-handler | Gestos de toque |
-| AsyncStorage | Armazenamento local (Offline First) |
-| Firebase Authentication | Login e cadastro de usuários |
-| Firebase Firestore | Sincronização dos desenhos na nuvem |
-| NetInfo | Detecção de conectividade em tempo real |
-
----
-
-## Como rodar
-
-```bash
-# Instalar dependências
-npm install
-
-# Iniciar com Expo Go
-npm start
-```
-
-Escanear o QR code com o aplicativo **Expo Go** no celular.
-
-> **Credenciais de teste:** qualquer e-mail/senha cadastrado no Firebase, ou entre como visitante.
-
----
-
-## Fluxo de Telas
-
-```
-Login → Galeria → Tela de Desenho → Salvar → Galeria
-         ↑_______________________________↑
-                (sincronização automática)
-```
-
----
-
-## Demonstração Offline
-
-1. Ative o **modo avião** no celular
-2. Abra o app → o banner laranja aparece: *"Sem internet"*
-3. Desenhe e salve → o esboço é gravado localmente com ❌
-4. Desative o modo avião
-5. Abra a galeria → o banner azul aparece: *"Sincronizando..."*
-6. O ícone vira ✅ — sincronizado com o Firestore!
-
----
-
-## Equipe
+# Pintadasso — Caderno de Esboços Digital
 
 Projeto desenvolvido como trabalho para a disciplina de desenvolvimento mobile pelos alunos:
 - **Vitor Camargo Kunicki**
 - **Nicolas Urban**
 - **Miguel Ribas JR**
+
+---
+
+## 🎯 Tema e Problema
+**Problema:** Estudantes de arte, designers e entusiastas muitas vezes não têm um caderno físico no momento em que a inspiração bate.  
+**Proposta de Valor:** Oferecer um caderno de esboços digital de bolso, com ferramentas de desenho, que funciona **100% offline** e sincroniza automaticamente com a nuvem quando a conexão é restabelecida.
+
+![Firebase Funcionando](./assets/firebase/firebase.png)
+
+---
+
+## ✅ Atendimento aos Requisitos do Projeto
+
+O Pintadasso foi construído com foco na arquitetura **Offline First**, cumprindo todos os requisitos e objetivos propostos para o MVP:
+
+### 1. Implementação no React Native com Expo
+A interface foi totalmente desenvolvida em React Native (usando TypeScript), garantindo navegação fluida entre telas (Login, Cadastro, Galeria e Desenho) com `react-navigation`. O Canvas de desenho utiliza `react-native-svg` aliado a captura de gestos (`react-native-gesture-handler`).
+
+### 2. Integração com Firebase
+- **Autenticação:** O sistema possui login e cadastro integrados com o Firebase Authentication.
+- **Persistência Remota:** Os dados dos desenhos são salvos no banco de dados Firestore (Firebase) vinculados à conta de cada usuário. O Firebase também envia os desenhos salvos anteriormente na nuvem de volta ao dispositivo, garantindo continuidade do fluxo de trabalho em outros aparelhos.
+
+### 3. Persistência Local e Offline First
+O pilar do aplicativo. Mesmo sem internet (modo avião ativado), o aplicativo mantém 100% de sua utilidade primária:
+- **Armazenamento:** Todo desenho é salvo primariamente de forma local usando o `AsyncStorage`.
+- **Offline First:** O aplicativo não trava sem conexão; ele salva o dado localmente e altera o ícone de status do desenho para pendente de sincronização (❌).
+
+### 4. Estratégia de Sincronização
+A regra de sincronização implementada (bidirecional) funciona da seguinte forma:
+1. Ao salvar um desenho offline, ele entra em uma "fila" no AsyncStorage.
+2. Sempre que a tela da Galeria é aberta, o app detecta a conexão em tempo real (`NetInfo`).
+3. Existindo conexão, o app automaticamente lê a fila local, faz o envio pro Firebase, altera o status visual para ✅ e atualiza o cache local.
+4. Ele também faz o *download* automático de esboços do Firestore que ainda não estavam na memória local.
+
+### 5. Tratamento Básico de Estados
+Foram previstos alertas visuais para os diferentes estados do ciclo de vida:
+- **Carregamento:** *Spinners* (ActivityIndicator) durante salvamentos e bloqueio de botões.
+- **Ausência de Conexão:** Banners informativos no topo da Galeria ("Sem internet", "Sincronizando...").
+- **Sucesso e Erro:** Alertas/pop-ups para confirmar exclusão, limpeza da tela e avisos de falhas.
+
+---
+
+## 🚀 Como rodar o projeto
+
+```bash
+# 1. Instale as dependências
+npm install
+
+# 2. Inicie o servidor do Expo
+npm start
+```
+No terminal, pressione `w` para abrir no navegador web ou leia o QRCode com o aplicativo **Expo Go** no seu celular.
