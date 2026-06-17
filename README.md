@@ -10,7 +10,7 @@ Estudantes de arte, designers e entusiastas do desenho muitas vezes não têm ac
 
 **Público-alvo:** Estudantes de design, ilustradores iniciantes, artistas que querem registrar esboços rápidos no dia a dia.
 
-![Firebase Funcionando](./assets/images/firebase.png)
+![Firebase Funcionando](./assets/firebase/firebase.png)
 
 ---
 
