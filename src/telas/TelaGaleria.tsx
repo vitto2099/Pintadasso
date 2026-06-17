@@ -10,7 +10,7 @@ import Svg, { Path, Rect, Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import NetInfo from '@react-native-community/netinfo';
 import { Platform } from 'react-native';
 import { autenticacao, bancoDeDados } from '../servicos/configuracaoFirebase';
@@ -165,14 +165,57 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
     }
   };
 
+  const baixarDesenhosDaNuvem = async (listaLocal: Desenho[]) => {
+    const estado = await NetInfo.fetch();
+    if (!estado.isConnected || !estado.isInternetReachable) return listaLocal;
+    if (!autenticacao.currentUser) return listaLocal;
+
+    try {
+      const ref = collection(bancoDeDados, 'usuarios', autenticacao.currentUser.uid, 'desenhos');
+      const snap = await getDocs(ref);
+      let houveMudanca = false;
+      const novaLista = [...listaLocal];
+
+      snap.forEach(doc => {
+        const dados = doc.data();
+        const idNuvem = dados.idLocal;
+        
+        const existeLocal = novaLista.find(d => d.id === idNuvem);
+        if (!existeLocal && dados.tracosJson) {
+          const desenhoBaixado: Desenho = {
+            id: idNuvem,
+            nome: dados.nome,
+            data: dados.data,
+            fundo: dados.fundo,
+            tracos: JSON.parse(dados.tracosJson || '[]'),
+            sincronizado: true,
+          };
+          novaLista.push(desenhoBaixado);
+          houveMudanca = true;
+        }
+      });
+
+      if (houveMudanca) {
+        novaLista.sort((a, b) => Number(b.id) - Number(a.id));
+        await AsyncStorage.setItem('@desenhos', JSON.stringify(novaLista));
+        return novaLista;
+      }
+      return listaLocal;
+    } catch {
+      return listaLocal;
+    }
+  };
+
   const carregarDesenhos = async () => {
     try {
       const json = await AsyncStorage.getItem('@desenhos');
       const lista = json ? JSON.parse(json) : [];
       setDesenhos(lista);
-      // Tenta sincronizar pendentes ao carregar
+      
       const listaAtualizada = await sincronizarPendentes(lista);
-      setDesenhos(listaAtualizada);
+      const listaComNuvem = await baixarDesenhosDaNuvem(listaAtualizada);
+      
+      setDesenhos(listaComNuvem);
     } catch {
       Alert.alert('Erro', 'Não foi possível carregar os esboços.');
     }

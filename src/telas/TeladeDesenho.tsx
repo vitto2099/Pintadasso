@@ -90,14 +90,17 @@ async function sincronizarComNuvem(desenho: any) {
 
 type TeladeDesenhoProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Desenho'>;
+  route?: any;
 };
 
-export default function TeladeDesenho({ navigation }: TeladeDesenhoProps) {
-  const [tracos, setTracos] = useState<Traco[]>([]);
+export default function TeladeDesenho({ navigation, route }: TeladeDesenhoProps) {
+  const desenhoExistente = route?.params?.desenho;
+
+  const [tracos, setTracos] = useState<Traco[]>(desenhoExistente?.tracos || []);
   const [tracoAtual, setTracoAtual] = useState<Traco | null>(null);
   const [corAtual, setCorAtual] = useState(PALETA_CORES[0].cor);
   const [pincelAtual, setPincelAtual] = useState(PINCEIS[1]);
-  const [fundoAtual, setFundoAtual] = useState('linhas');
+  const [fundoAtual, setFundoAtual] = useState(desenhoExistente?.fundo || 'linhas');
   const [abaAtiva, setAbaAtiva] = useState('cores');
   const [salvando, setSalvando] = useState(false);
 
@@ -144,15 +147,16 @@ export default function TeladeDesenho({ navigation }: TeladeDesenhoProps) {
       const lista = existentes ? JSON.parse(existentes) : [];
 
       const novoDesenho = {
-        id: Date.now().toString(),
-        nome: `Esboço ${lista.length + 1}`,
+        id: desenhoExistente ? desenhoExistente.id : Date.now().toString(),
+        nome: desenhoExistente ? desenhoExistente.nome : `Esboço ${lista.length + 1}`,
         data: new Date().toLocaleDateString('pt-BR'),
         tracos,
         fundo: fundoAtual,
         sincronizado: false, // começa como não sincronizado
       };
 
-      const listaAtualizada = [novoDesenho, ...lista];
+      const listaSemOAntigo = lista.filter((d: any) => d.id !== novoDesenho.id);
+      const listaAtualizada = [novoDesenho, ...listaSemOAntigo];
       await AsyncStorage.setItem('@desenhos', JSON.stringify(listaAtualizada));
 
       // 2. Verificar se há internet e tentar sincronizar
