@@ -12,11 +12,35 @@ import { useFocusEffect } from '@react-navigation/native';
 import { signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import NetInfo from '@react-native-community/netinfo';
+import { Platform } from 'react-native';
 import { autenticacao, bancoDeDados } from '../servicos/configuracaoFirebase';
 import { estilos } from '../styles/TelaGaleriaStyles';
 import { Cores } from '../styles/tema';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navegacao/Navegador';
 
-function MiniCanvas({ tracos, fundo }) {
+export type Traco = {
+  caminho: string;
+  cor: string;
+  espessura: number;
+  opacidade: number;
+};
+
+export type Desenho = {
+  id: string;
+  nome: string;
+  data: string;
+  fundo: string;
+  tracos: Traco[];
+  sincronizado?: boolean;
+};
+
+type MiniCanvasProps = {
+  tracos: Traco[];
+  fundo: string;
+};
+
+function MiniCanvas({ tracos, fundo }: MiniCanvasProps) {
   const escala = 0.12;
 
   const renderFundoMini = () => {
@@ -56,7 +80,7 @@ function MiniCanvas({ tracos, fundo }) {
 }
 
 // ── Sincroniza um desenho pendente com o Firestore ──────────────────────────
-async function sincronizarDesenho(desenho) {
+async function sincronizarDesenho(desenho: Desenho) {
   const usuario = autenticacao.currentUser;
   if (!usuario) return false;
   try {
@@ -75,21 +99,25 @@ async function sincronizarDesenho(desenho) {
   }
 }
 
-export default function TelaGaleria({ navigation }) {
-  const [desenhos, setDesenhos] = useState([]);
+type TelaGaleriaProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Galeria'>;
+};
+
+export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
+  const [desenhos, setDesenhos] = useState<Desenho[]>([]);
   const [online, setOnline] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
 
   // Monitor de conexão em tempo real
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
-      setOnline(state.isConnected && state.isInternetReachable);
+      setOnline(!!(state.isConnected && state.isInternetReachable));
     });
     return () => unsubscribe();
   }, []);
 
   // Sincronizar pendentes automaticamente ao voltar online
-  const sincronizarPendentes = async (lista) => {
+  const sincronizarPendentes = async (lista: Desenho[]) => {
     const estado = await NetInfo.fetch();
     if (!estado.isConnected || !estado.isInternetReachable) return lista;
     if (!autenticacao.currentUser) return lista;
@@ -112,22 +140,29 @@ export default function TelaGaleria({ navigation }) {
     return listaAtualizada;
   };
 
-  const handleSair = () => {
-    Alert.alert('Sair', 'Deseja encerrar a sessão?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Sair',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await signOut(autenticacao);
-          } catch {
-            // visitante não tem sessão Firebase — apenas navega
-          }
-          navigation.replace('Login');
+  const handleSair = async () => {
+    if (Platform.OS === 'web') {
+      if (window.confirm('Deseja encerrar a sessão?')) {
+        try { await signOut(autenticacao); } catch {}
+        navigation.replace('Login');
+      }
+    } else {
+      Alert.alert('Sair', 'Deseja encerrar a sessão?', [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut(autenticacao);
+            } catch {
+              // visitante não tem sessão Firebase — apenas navega
+            }
+            navigation.replace('Login');
+          },
         },
-      },
-    ]);
+      ]);
+    }
   };
 
   const carregarDesenhos = async () => {
@@ -149,22 +184,30 @@ export default function TelaGaleria({ navigation }) {
     }, [])
   );
 
-  const handleExcluir = (id) => {
-    Alert.alert('Excluir esboço', 'Tem certeza?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          const novos = desenhos.filter((d) => d.id !== id);
-          setDesenhos(novos);
-          await AsyncStorage.setItem('@desenhos', JSON.stringify(novos));
+  const handleExcluir = (id: string) => {
+    const deletar = async () => {
+      const novos = desenhos.filter((d) => d.id !== id);
+      setDesenhos(novos);
+      await AsyncStorage.setItem('@desenhos', JSON.stringify(novos));
+    };
+
+    if (Platform.OS === 'web') {
+      if (window.confirm('Tem certeza que deseja excluir este esboço?')) {
+        deletar();
+      }
+    } else {
+      Alert.alert('Excluir esboço', 'Tem certeza?', [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: deletar,
         },
-      },
-    ]);
+      ]);
+    }
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: { item: Desenho }) => (
     <View style={estilos.card}>
       <TouchableOpacity
         style={estilos.areaPreview}
@@ -211,6 +254,9 @@ export default function TelaGaleria({ navigation }) {
       {/* Cabeçalho */}
       <View style={estilos.cabecalho}>
         <View style={{ flex: 1 }}>
+          <Text style={{ color: Cores.textoMuted, fontSize: 13, marginBottom: 2 }}>
+            {autenticacao.currentUser?.email ? `Olá, ${autenticacao.currentUser.email}` : 'Modo Visitante'}
+          </Text>
           <Text style={estilos.titulo}> Meus Esboços</Text>
           <Text style={estilos.subtitulo}>{desenhos.length} desenho{desenhos.length !== 1 ? 's' : ''} salvos</Text>
         </View>

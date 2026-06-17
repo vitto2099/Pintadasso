@@ -8,7 +8,14 @@ import TelaGaleria from '../telas/TelaGaleria';
 import TeladeDesenho from '../telas/TeladeDesenho';
 import { Cores } from '../styles/tema';
 
-const Pilha = createNativeStackNavigator();
+export type RootStackParamList = {
+  Login: undefined;
+  Cadastro: undefined;
+  Galeria: undefined;
+  Desenho: { desenho?: any } | undefined;
+};
+
+const Pilha = createNativeStackNavigator<RootStackParamList>();
 
 export default function Navegador() {
   return (

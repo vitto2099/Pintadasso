@@ -16,6 +16,15 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { autenticacao, bancoDeDados } from '../servicos/configuracaoFirebase';
 import { estilos } from '../styles/TeladeDesenhoStyles';
 import { Cores } from '../styles/tema';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navegacao/Navegador';
+
+export type Traco = {
+  caminho: string;
+  cor: string;
+  espessura: number;
+  opacidade: number;
+};
 
 // ── Paleta de cores artísticas ──────────────────────────────────────────────
 const PALETA_CORES = [
@@ -57,7 +66,7 @@ const FUNDOS = [
 ];
 
 // ── Tenta sincronizar um desenho com o Firestore ─────────────────────────────
-async function sincronizarComNuvem(desenho) {
+async function sincronizarComNuvem(desenho: any) {
   const usuario = autenticacao.currentUser;
   if (!usuario) return false; // visitante não sincroniza
 
@@ -73,15 +82,19 @@ async function sincronizarComNuvem(desenho) {
       idLocal: desenho.id,
     });
     return true;
-  } catch (e) {
+  } catch (e: any) {
     console.log('Erro ao sincronizar:', e.message);
     return false;
   }
 }
 
-export default function TeladeDesenho({ navigation }) {
-  const [tracos, setTracos] = useState([]);
-  const [tracoAtual, setTracoAtual] = useState(null);
+type TeladeDesenhoProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Desenho'>;
+};
+
+export default function TeladeDesenho({ navigation }: TeladeDesenhoProps) {
+  const [tracos, setTracos] = useState<Traco[]>([]);
+  const [tracoAtual, setTracoAtual] = useState<Traco | null>(null);
   const [corAtual, setCorAtual] = useState(PALETA_CORES[0].cor);
   const [pincelAtual, setPincelAtual] = useState(PINCEIS[1]);
   const [fundoAtual, setFundoAtual] = useState('linhas');
@@ -94,7 +107,7 @@ export default function TeladeDesenho({ navigation }) {
   const gestoPan = Gesture.Pan()
     .runOnJS(true)
     .minDistance(0)
-    .onStart((e) => {
+    .onStart((e: any) => {
       setTracoAtual({
         caminho: `M ${e.x.toFixed(1)} ${e.y.toFixed(1)}`,
         cor: corDesenho,
@@ -102,7 +115,7 @@ export default function TeladeDesenho({ navigation }) {
         opacidade: pincelAtual.opacidade,
       });
     })
-    .onChange((e) => {
+    .onChange((e: any) => {
       setTracoAtual((prev) =>
         prev
           ? { ...prev, caminho: `${prev.caminho} L ${e.x.toFixed(1)} ${e.y.toFixed(1)}` }
@@ -164,11 +177,18 @@ export default function TeladeDesenho({ navigation }) {
         ? 'Salvo localmente e na nuvem'
         : 'Salvo no dispositivo. Será enviado à nuvem quando houver internet';
 
-      Alert.alert('Salvo!', mensagem, [
-        { text: 'Ver Galeria', onPress: () => navigation.navigate('Galeria') },
-        { text: 'Continuar desenhando' },
-      ]);
-    } catch (e) {
+      if (Platform.OS === 'web') {
+        const irParaGaleria = window.confirm(`${mensagem}\n\nDeseja ir para a Galeria? (Cancele para continuar desenhando)`);
+        if (irParaGaleria) {
+          navigation.navigate('Galeria');
+        }
+      } else {
+        Alert.alert('Salvo!', mensagem, [
+          { text: 'Ver Galeria', onPress: () => navigation.navigate('Galeria') },
+          { text: 'Continuar desenhando' },
+        ]);
+      }
+    } catch (e: any) {
       Alert.alert('Erro', 'Não foi possível salvar o esboço.');
     } finally {
       setSalvando(false);
@@ -177,10 +197,16 @@ export default function TeladeDesenho({ navigation }) {
 
   const handleDesfazer = () => setTracos((prev) => prev.slice(0, -1));
   const handleLimpar = () => {
-    Alert.alert('Limpar tela', 'Tem certeza? Isso apagará tudo.', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Limpar', style: 'destructive', onPress: () => setTracos([]) },
-    ]);
+    if (Platform.OS === 'web') {
+      if (window.confirm('Tem certeza? Isso apagará tudo.')) {
+        setTracos([]);
+      }
+    } else {
+      Alert.alert('Limpar tela', 'Tem certeza? Isso apagará tudo.', [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Limpar', style: 'destructive', onPress: () => setTracos([]) },
+      ]);
+    }
   };
 
   // ── Elementos de fundo ─────────────────────────────────────────────────────

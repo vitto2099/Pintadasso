@@ -15,7 +15,14 @@ import { autenticacao } from '../servicos/configuracaoFirebase';
 import { estilos } from '../styles/TelaCadastroStyles';
 import { Cores } from '../styles/tema';
 
-export default function TelaCadastro({ navigation }) {
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navegacao/Navegador';
+
+type TelaCadastroProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Cadastro'>;
+};
+
+export default function TelaCadastro({ navigation }: TelaCadastroProps) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmSenha, setConfirmSenha] = useState('');
@@ -41,7 +48,7 @@ export default function TelaCadastro({ navigation }) {
       Alert.alert('Conta criada! 🎉', 'Bem-vindo ao Pintadasso!', [
         { text: 'Começar a desenhar', onPress: () => navigation.replace('Galeria') },
       ]);
-    } catch (erro) {
+    } catch (erro: any) {
       const mensagens = {
         'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
         'auth/invalid-email': 'E-mail inválido.',
@@ -49,7 +56,7 @@ export default function TelaCadastro({ navigation }) {
       };
       Alert.alert(
         'Erro ao cadastrar',
-        mensagens[erro.code] || 'Ocorreu um erro. Tente novamente.'
+        mensagens[erro.code as keyof typeof mensagens] || 'Ocorreu um erro. Tente novamente.'
       );
     } finally {
       setCarregando(false);
