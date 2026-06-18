@@ -11,7 +11,7 @@ Projeto desenvolvido como trabalho para a disciplina de desenvolvimento mobile p
 **Problema:** Estudantes de arte, designers e entusiastas muitas vezes não têm um caderno físico no momento em que a inspiração bate.  
 **Proposta de Valor:** Oferecer um caderno de esboços digital de bolso, com ferramentas de desenho, que funciona **100% offline** e sincroniza automaticamente com a nuvem quando a conexão é restabelecida.
 
-![Firebase Funcionando](./assets/firebase/firebase.png)
+![Firebase Funcionando](./assets/firebase/firebasefuncionando.png)
 
 ---
 
@@ -25,7 +25,7 @@ A interface foi totalmente desenvolvida em React Native (usando TypeScript), gar
 ### 2. Integração com Firebase
 - **Autenticação:** O sistema possui login e cadastro integrados com o Firebase Authentication. Abaixo está a prova de que a autenticação de usuários via Firebase está funcionando perfeitamente:
   
-  ![Prova de Autenticação no Firebase](./assets/firebase/auth_proof.png)
+  ![Prova de Autenticação no Firebase](./assets/firebase/firebasefuncionando.png)
 
 - **Persistência Remota:** Os dados dos desenhos são salvos no banco de dados Firestore (Firebase) vinculados à conta de cada usuário. O Firebase também envia os desenhos salvos anteriormente na nuvem de volta ao dispositivo, garantindo continuidade do fluxo de trabalho em outros aparelhos.
 
