@@ -23,7 +23,10 @@ O Pintadasso foi construído com foco na arquitetura **Offline First**, cumprind
 A interface foi totalmente desenvolvida em React Native (usando TypeScript), garantindo navegação fluida entre telas (Login, Cadastro, Galeria e Desenho) com `react-navigation`. O Canvas de desenho utiliza `react-native-svg` aliado a captura de gestos (`react-native-gesture-handler`).
 
 ### 2. Integração com Firebase
-- **Autenticação:** O sistema possui login e cadastro integrados com o Firebase Authentication.
+- **Autenticação:** O sistema possui login e cadastro integrados com o Firebase Authentication. Abaixo está a prova de que a autenticação de usuários via Firebase está funcionando perfeitamente:
+  
+  ![Prova de Autenticação no Firebase](./assets/firebase/auth_proof.png)
+
 - **Persistência Remota:** Os dados dos desenhos são salvos no banco de dados Firestore (Firebase) vinculados à conta de cada usuário. O Firebase também envia os desenhos salvos anteriormente na nuvem de volta ao dispositivo, garantindo continuidade do fluxo de trabalho em outros aparelhos.
 
 ### 3. Persistência Local e Offline First
