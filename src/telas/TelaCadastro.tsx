@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
+  ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { autenticacao } from '../servicos/configuracaoFirebase';
 import { estilos } from '../styles/TelaCadastroStyles';
 import { Cores } from '../styles/tema';
@@ -46,7 +46,7 @@ export default function TelaCadastro({ navigation }: TelaCadastroProps) {
     try {
       await createUserWithEmailAndPassword(autenticacao, email.trim(), senha);
       Alert.alert(
-        'Conta criada! 🎉',
+        'Conta criada! ',
         'Bem-vindo ao Pintadasso!',
         [{ text: 'Começar a desenhar', onPress: () => navigation.replace('Galeria') }],
         { cancelable: false }
@@ -74,7 +74,7 @@ export default function TelaCadastro({ navigation }: TelaCadastroProps) {
       <ScrollView contentContainerStyle={estilos.scroll} keyboardShouldPersistTaps="handled">
 
         <View style={estilos.areaTitulo}>
-          <Text style={estilos.emoji}>📝</Text>
+          <Text style={estilos.emoji}></Text>
           <Text style={estilos.titulo}>Nova Conta</Text>
           <Text style={estilos.subtitulo}>Crie sua conta e comece a esboçar</Text>
         </View>

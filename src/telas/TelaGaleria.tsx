@@ -1,23 +1,23 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import Svg, { Path, Rect, Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
-import { signOut } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp, getDocs } from 'firebase/firestore';
 import NetInfo from '@react-native-community/netinfo';
-import { Platform } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { signOut } from 'firebase/auth';
+import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Svg, { Line, Path, Rect } from 'react-native-svg';
+import { RootStackParamList } from '../navegacao/Navegador';
 import { autenticacao, bancoDeDados } from '../servicos/configuracaoFirebase';
 import { estilos } from '../styles/TelaGaleriaStyles';
 import { Cores } from '../styles/tema';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navegacao/Navegador';
 
 export type Traco = {
   caminho: string;
@@ -268,9 +268,9 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
           <Text style={estilos.nomeDesenho}>{item.nome}</Text>
           <Text style={{ fontSize: 14 }}>{item.sincronizado ? '✓' : '✗'}</Text>
         </View>
-        <Text style={estilos.dataDesenho}>📅 {item.data}</Text>
+        <Text style={estilos.dataDesenho}> {item.data}</Text>
         <Text style={estilos.qtdTracosDesenho}>
-          🖊 {item.tracos?.length || 0} traços
+           {item.tracos?.length || 0} traços
         </Text>
       </View>
       <TouchableOpacity
@@ -315,7 +315,7 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
       {/* Lista */}
       {desenhos.length === 0 ? (
         <View style={estilos.containerVazio}>
-          <Text style={estilos.iconeVazio}>📒</Text>
+          <Text style={estilos.iconeVazio}></Text>
           <Text style={estilos.textoVazio}>Sua galeria está vazia</Text>
           <Text style={estilos.subtextoVazio}>Toque no botão abaixo para criar seu primeiro esboço!</Text>
         </View>

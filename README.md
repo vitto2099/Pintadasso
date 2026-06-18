@@ -7,7 +7,7 @@ Projeto desenvolvido como trabalho para a disciplina de desenvolvimento mobile p
 
 ---
 
-## 🎯 Tema e Problema
+##  Tema e Problema
 **Problema:** Estudantes de arte, designers e entusiastas muitas vezes não têm um caderno físico no momento em que a inspiração bate.  
 **Proposta de Valor:** Oferecer um caderno de esboços digital de bolso, com ferramentas de desenho, que funciona **100% offline** e sincroniza automaticamente com a nuvem quando a conexão é restabelecida.
 
@@ -15,7 +15,7 @@ Projeto desenvolvido como trabalho para a disciplina de desenvolvimento mobile p
 
 ---
 
-## ✅ Atendimento aos Requisitos do Projeto
+## Atendimento aos Requisitos do Projeto
 
 O Pintadasso foi construído com foco na arquitetura **Offline First**, cumprindo todos os requisitos e objetivos propostos para o MVP:
 
@@ -32,13 +32,13 @@ A interface foi totalmente desenvolvida em React Native (usando TypeScript), gar
 ### 3. Persistência Local e Offline First
 O pilar do aplicativo. Mesmo sem internet (modo avião ativado), o aplicativo mantém 100% de sua utilidade primária:
 - **Armazenamento:** Todo desenho é salvo primariamente de forma local usando o `AsyncStorage`.
-- **Offline First:** O aplicativo não trava sem conexão; ele salva o dado localmente e altera o ícone de status do desenho para pendente de sincronização (❌).
+- **Offline First:** O aplicativo não trava sem conexão; ele salva o dado localmente e altera o ícone de status do desenho para pendente de sincronização.
 
 ### 4. Estratégia de Sincronização
 A regra de sincronização implementada (bidirecional) funciona da seguinte forma:
 1. Ao salvar um desenho offline, ele entra em uma "fila" no AsyncStorage.
 2. Sempre que a tela da Galeria é aberta, o app detecta a conexão em tempo real (`NetInfo`).
-3. Existindo conexão, o app automaticamente lê a fila local, faz o envio pro Firebase, altera o status visual para ✅ e atualiza o cache local.
+3. Existindo conexão, o app automaticamente lê a fila local, faz o envio pro Firebase, altera o status visual e atualiza o cache local.
 4. Ele também faz o *download* automático de esboços do Firestore que ainda não estavam na memória local.
 
 ### 5. Tratamento Básico de Estados
@@ -49,7 +49,7 @@ Foram previstos alertas visuais para os diferentes estados do ciclo de vida:
 
 ---
 
-## 🚀 Como rodar o projeto
+## Como rodar o projeto
 
 ```bash
 # 1. Instale as dependências
