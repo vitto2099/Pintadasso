@@ -29,14 +29,14 @@ export default function TelaLogin({ navigation }: TelaLoginProps) {
   const [carregando, setCarregando] = useState(false);
 
   const handleEntrar = async () => {
-    if (!email || !senha) {
+    if (!email.trim() || !senha) {
       Alert.alert('Atenção', 'Preencha e-mail e senha.');
       return;
     }
 
     setCarregando(true);
     try {
-      await signInWithEmailAndPassword(autenticacao, email, senha);
+      await signInWithEmailAndPassword(autenticacao, email.trim(), senha);
       navigation.replace('Galeria');
     } catch (erro: any) {
       const mensagens = {

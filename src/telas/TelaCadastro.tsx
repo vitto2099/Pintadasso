@@ -29,7 +29,7 @@ export default function TelaCadastro({ navigation }: TelaCadastroProps) {
   const [carregando, setCarregando] = useState(false);
 
   const handleCadastrar = async () => {
-    if (!email || !senha) {
+    if (!email.trim() || !senha || !confirmSenha) {
       Alert.alert('Atenção', 'Preencha todos os campos.');
       return;
     }
@@ -44,10 +44,13 @@ export default function TelaCadastro({ navigation }: TelaCadastroProps) {
 
     setCarregando(true);
     try {
-      await createUserWithEmailAndPassword(autenticacao, email, senha);
-      Alert.alert('Conta criada! 🎉', 'Bem-vindo ao Pintadasso!', [
-        { text: 'Começar a desenhar', onPress: () => navigation.replace('Galeria') },
-      ]);
+      await createUserWithEmailAndPassword(autenticacao, email.trim(), senha);
+      Alert.alert(
+        'Conta criada! 🎉',
+        'Bem-vindo ao Pintadasso!',
+        [{ text: 'Começar a desenhar', onPress: () => navigation.replace('Galeria') }],
+        { cancelable: false }
+      );
     } catch (erro: any) {
       const mensagens = {
         'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
