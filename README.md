@@ -9,7 +9,7 @@ Projeto desenvolvido como trabalho para a disciplina de desenvolvimento mobile p
 
 ##  Tema e Problema
 **Problema:** Estudantes de arte, designers e entusiastas muitas vezes não têm um caderno físico no momento em que a inspiração bate.  
-**Proposta de Valor:** Oferecer um caderno de esboços digital de bolso, com ferramentas de desenho, que funciona **100% offline** e sincroniza automaticamente com a nuvem quando a conexão é restabelecida.
+**Proposta de Valor:** Oferecer um caderno de esboços digital , com ferramentas de desenho, que funciona **100% offline** e sincroniza automaticamente com a nuvem quando a conexão é restabelecida.
 
 ![Firebase Funcionando](./assets/firebase/firebasefuncionando.png)
 
