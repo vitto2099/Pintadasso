@@ -108,6 +108,10 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
   const [online, setOnline] = useState(true);
   const [sincronizando, setSincronizando] = useState(false);
 
+  const getStorageKey = () => {
+    return autenticacao.currentUser ? `@desenhos_${autenticacao.currentUser.uid}` : '@desenhos_visitante';
+  };
+
   // Monitor de conexão em tempo real
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -135,7 +139,7 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
         );
       }
     }
-    await AsyncStorage.setItem('@desenhos', JSON.stringify(listaAtualizada));
+    await AsyncStorage.setItem(getStorageKey(), JSON.stringify(listaAtualizada));
     setSincronizando(false);
     return listaAtualizada;
   };
@@ -197,7 +201,7 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
 
       if (houveMudanca) {
         novaLista.sort((a, b) => Number(b.id) - Number(a.id));
-        await AsyncStorage.setItem('@desenhos', JSON.stringify(novaLista));
+        await AsyncStorage.setItem(getStorageKey(), JSON.stringify(novaLista));
         return novaLista;
       }
       return listaLocal;
@@ -208,7 +212,7 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
 
   const carregarDesenhos = async () => {
     try {
-      const json = await AsyncStorage.getItem('@desenhos');
+      const json = await AsyncStorage.getItem(getStorageKey());
       const lista = json ? JSON.parse(json) : [];
       setDesenhos(lista);
       
@@ -231,7 +235,7 @@ export default function TelaGaleria({ navigation }: TelaGaleriaProps) {
     const deletar = async () => {
       const novos = desenhos.filter((d) => d.id !== id);
       setDesenhos(novos);
-      await AsyncStorage.setItem('@desenhos', JSON.stringify(novos));
+      await AsyncStorage.setItem(getStorageKey(), JSON.stringify(novos));
     };
 
     if (Platform.OS === 'web') {

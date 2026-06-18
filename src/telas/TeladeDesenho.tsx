@@ -142,8 +142,10 @@ export default function TeladeDesenho({ navigation, route }: TeladeDesenhoProps)
     setSalvando(true);
 
     try {
+      const getStorageKey = () => autenticacao.currentUser ? `@desenhos_${autenticacao.currentUser.uid}` : '@desenhos_visitante';
+      
       // 1. Salvar sempre localmente primeiro (Offline First)
-      const existentes = await AsyncStorage.getItem('@desenhos');
+      const existentes = await AsyncStorage.getItem(getStorageKey());
       const lista = existentes ? JSON.parse(existentes) : [];
 
       const novoDesenho = {
@@ -157,7 +159,7 @@ export default function TeladeDesenho({ navigation, route }: TeladeDesenhoProps)
 
       const listaSemOAntigo = lista.filter((d: any) => d.id !== novoDesenho.id);
       const listaAtualizada = [novoDesenho, ...listaSemOAntigo];
-      await AsyncStorage.setItem('@desenhos', JSON.stringify(listaAtualizada));
+      await AsyncStorage.setItem(getStorageKey(), JSON.stringify(listaAtualizada));
 
       // 2. Verificar se há internet e tentar sincronizar
       const estado = await NetInfo.fetch();
@@ -172,7 +174,7 @@ export default function TeladeDesenho({ navigation, route }: TeladeDesenhoProps)
           const listaSync = listaAtualizada.map((d) =>
             d.id === novoDesenho.id ? { ...d, sincronizado: true } : d
           );
-          await AsyncStorage.setItem('@desenhos', JSON.stringify(listaSync));
+          await AsyncStorage.setItem(getStorageKey(), JSON.stringify(listaSync));
         }
       }
 
